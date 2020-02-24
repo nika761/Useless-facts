@@ -2,13 +2,9 @@
 <resources>
     <array name="background_images">
         <item>@drawable/background</item>
-        <item>@drawable/background_one</item>
-        <item>@drawable/background_two</item>
-        <item>@drawable/background_three</item>
-        <item>@drawable/background_four</item>
-        <item>@drawable/background_five</item>
         <item>@drawable/background_six</item>
-
+        <item>@drawable/background_one</item>
+        <item>@drawable/background_five</item>
+        <item>@drawable/background_four</item>
     </array>
-
 </resources>

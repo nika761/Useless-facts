@@ -27,27 +27,23 @@ public class MainActivityPresenter {
                     FactsModel factsResponse = response.body();
                     iMainActivity.onUpdateFact(factsResponse);
                     assert response.body() != null;
-                    getOldFact(response.body().getText());
+                    //iMainActivity.getOldFact(response.body().getText());
                 }
             }
 
             @Override
             public void onFailure(Call<FactsModel> call, Throwable t) {
-
             }
         });
     }
 
-    public void getOldFact(String string){
-        String str = string;
-        iMainActivity.getOldFact(str);
-    }
 
     public void fetchTodayFact(){
         ApiService service = RetrofitManager.getApiservice();
         service.fetchTodayFact().enqueue(new Callback<FactsModel>() {
             @Override
             public void onResponse(Call<FactsModel> call, Response<FactsModel> response) {
+                iMainActivity.endProgressDialog();
                 if (Objects.requireNonNull(response.isSuccessful())){
                     FactsModel factsModel = response.body();
                     iMainActivity.onUpdateTodayFact(factsModel);
@@ -56,7 +52,7 @@ public class MainActivityPresenter {
 
             @Override
             public void onFailure(Call<FactsModel> call, Throwable t) {
-
+                iMainActivity.endProgressDialog();
             }
         });
     }
