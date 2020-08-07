@@ -3,34 +3,36 @@ package com.example.usulessfacts;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.constraintlayout.widget.ConstraintLayout;
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
+
 import android.annotation.SuppressLint;
 import android.app.ProgressDialog;
-import android.content.Context;
 import android.content.Intent;
 import android.content.res.Resources;
 import android.content.res.TypedArray;
-import android.net.ConnectivityManager;
-import android.net.NetworkInfo;
 import android.os.Bundle;
 import android.widget.Button;
 import android.widget.ImageButton;
 import android.widget.TextView;
 import android.widget.Toast;
+
 import com.daimajia.androidanimations.library.Techniques;
 import com.daimajia.androidanimations.library.YoYo;
 import com.example.usulessfacts.intarfaces.IMainActivity;
 import com.example.usulessfacts.model.FactsModel;
 import com.example.usulessfacts.presenter.MainActivityPresenter;
-import java.util.Objects;
+
 import java.util.Random;
+
+import static com.example.usulessfacts.helper.Utils.checkNetworkConnection;
+import static com.example.usulessfacts.helper.Utils.noConnectionToast;
 
 public class MainActivity extends AppCompatActivity implements IMainActivity {
     private MainActivityPresenter presenter;
     private TextView factBody;
-    private Button getNewFactButton,getPreviousFact;
+    private Button getNewFactButton, getPreviousFact;
     private ImageButton shareButton;
     private ConstraintLayout layout;
-    private String currentString,oldString;
+    private String currentString, oldString;
     private ProgressDialog progressDialog;
     private SwipeRefreshLayout swipeRefreshLayout;
 
@@ -45,7 +47,7 @@ public class MainActivity extends AppCompatActivity implements IMainActivity {
         setAnimation();
     }
 
-    public void iniUi(){
+    public void iniUi() {
         factBody = findViewById(R.id.fact_id);
         getNewFactButton = findViewById(R.id.new_fact_button);
         layout = findViewById(R.id.parentFor_factBody);
@@ -54,13 +56,13 @@ public class MainActivity extends AppCompatActivity implements IMainActivity {
         swipeRefreshLayout = findViewById(R.id.swipe_refresh_layout);
     }
 
-    public void clickListeners(){
+    public void clickListeners() {
         getNewFactButton.setOnClickListener(v -> {
-            if (checkNetworkConnection()) {
+            if (checkNetworkConnection(this)) {
                 presenter.fetchFacts();
                 setBackground();
-            }else {
-                Toast.makeText(this," Network connection not available ",Toast.LENGTH_LONG).show();
+            } else {
+                noConnectionToast(this);
             }
         });
 
@@ -69,7 +71,7 @@ public class MainActivity extends AppCompatActivity implements IMainActivity {
             setAnimation();
         });
 
-        shareButton.setOnClickListener(v ->{
+        shareButton.setOnClickListener(v -> {
             setShareIntent(currentString);
         });
 
@@ -89,29 +91,17 @@ public class MainActivity extends AppCompatActivity implements IMainActivity {
         factBody.setText(factsModel.getText());
     }
 
-    public boolean checkNetworkConnection(){
-        boolean wifiConnected = false;
-        boolean mobileDataConnected = false;
 
-        ConnectivityManager connectivityManager = (ConnectivityManager) getSystemService(Context.CONNECTIVITY_SERVICE);
-        NetworkInfo networkInfo = Objects.requireNonNull(connectivityManager).getActiveNetworkInfo() ;
-        if (networkInfo != null && networkInfo.isConnected()){
-            wifiConnected = networkInfo.getType() == ConnectivityManager.TYPE_WIFI;
-            mobileDataConnected = networkInfo.getType() == ConnectivityManager.TYPE_MOBILE;
-        }
-        return wifiConnected||mobileDataConnected;
-    }
-
-    public void onNetworkConnectionChecked (){
-        if (checkNetworkConnection()){
+    public void onNetworkConnectionChecked() {
+        if (checkNetworkConnection(this)) {
             startTodayFact();
-        } else if (!checkNetworkConnection()){
-            Toast.makeText(this," Network connection not available ",Toast.LENGTH_LONG).show();
+        } else {
+            noConnectionToast(this);
             swipeRefreshLayout.setRefreshing(false);
         }
     }
 
-    public void startTodayFact(){
+    public void startTodayFact() {
         startProgressDialog();
         presenter.fetchTodayFact();
     }
@@ -121,7 +111,7 @@ public class MainActivity extends AppCompatActivity implements IMainActivity {
         currentString = string;
     }
 
-    public void startProgressDialog(){
+    public void startProgressDialog() {
         progressDialog = new ProgressDialog(MainActivity.this);
         progressDialog.setMax(100);
         progressDialog.setMessage("Loading...");
@@ -130,12 +120,12 @@ public class MainActivity extends AppCompatActivity implements IMainActivity {
         progressDialog.show();
     }
 
-    public void endProgressDialog(){
+    public void endProgressDialog() {
         swipeRefreshLayout.setRefreshing(false);
         progressDialog.dismiss();
     }
 
-    public void setBackground(){
+    public void setBackground() {
         Resources res = getResources();
         @SuppressLint("Recycle") final TypedArray myImages = res.obtainTypedArray(R.array.background_images);
         final Random random = new Random();
@@ -144,10 +134,10 @@ public class MainActivity extends AppCompatActivity implements IMainActivity {
         layout.setBackgroundResource(drawableID);
     }
 
-    public void setAnimation(){
+    public void setAnimation() {
         final Random random = new Random();
         int randomInt = random.nextInt(8);
-        switch(randomInt) {
+        switch (randomInt) {
             case 0:
                 YoYo.with(Techniques.Shake)
                         .duration(600)
@@ -191,7 +181,7 @@ public class MainActivity extends AppCompatActivity implements IMainActivity {
         }
     }
 
-    public void setShareIntent(String shareIntentString){
+    public void setShareIntent(String shareIntentString) {
         Intent sharingIntent = new Intent(android.content.Intent.ACTION_SEND);
         sharingIntent.setType("text/plain");
         sharingIntent.putExtra(android.content.Intent.EXTRA_SUBJECT, "Subject Here");
