@@ -24,7 +24,6 @@ import com.example.usulessfacts.presenter.MainActivityPresenter;
 import java.util.Random;
 
 import static com.example.usulessfacts.helper.Utils.checkNetworkConnection;
-import static com.example.usulessfacts.helper.Utils.noConnectionToast;
 
 public class MainActivity extends AppCompatActivity implements IMainActivity {
     private MainActivityPresenter presenter;
@@ -62,7 +61,7 @@ public class MainActivity extends AppCompatActivity implements IMainActivity {
                 presenter.fetchFacts();
                 setBackground();
             } else {
-                noConnectionToast(this);
+                Toast.makeText(this, " Network connection not available ", Toast.LENGTH_LONG).show();
             }
         });
 
@@ -96,7 +95,7 @@ public class MainActivity extends AppCompatActivity implements IMainActivity {
         if (checkNetworkConnection(this)) {
             startTodayFact();
         } else {
-            noConnectionToast(this);
+            Toast.makeText(this, " Network connection not available ", Toast.LENGTH_LONG).show();
             swipeRefreshLayout.setRefreshing(false);
         }
     }
